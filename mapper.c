@@ -1,3 +1,8 @@
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
@@ -26,3 +31,35 @@ struct data_struct
     unsigned long int           readTime_low;   //  Campo bajo de la marca de tiempo.               8
     const unsigned long int     RESERVED_3[8];  //  RESERVADO                                       64
 };
+
+int main(){
+
+    FILE *raw = fopen("./rawdata/datos","rb");
+    if(raw==NULL){
+        printf("Error al abrir binario");
+        exit(EXIT_FAILURE);
+    }
+
+    int raw_fd = fileno(raw);
+    if(raw_fd == -1){
+        printf("Error al obtener file descriptor");
+        exit(EXIT_FAILURE);
+    }
+
+    struct stat binary_stats;
+    int value = fstat(raw_fd,&binary_stats);
+    if(value == -1){
+        printf("Error al obtener stats");
+        exit(EXIT_FAILURE);
+    }
+
+    int binary_size = binary_stats.st_size;
+    int struct_size = sizeof(struct data_struct);
+    int cant_muestras = binary_size/struct_size;
+
+    //struct data_struct muestras[cant_muestras];
+
+    printf("File size: %d bytes\nStruct size: %d bytes\nCantidad de muestras: %d\n",binary_size,struct_size,cant_muestras);
+
+    exit(EXIT_SUCCESS);
+}
