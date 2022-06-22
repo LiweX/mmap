@@ -57,9 +57,19 @@ int main(){
     int struct_size = sizeof(struct data_struct);
     int cant_muestras = binary_size/struct_size;
 
-    //struct data_struct muestras[cant_muestras];
-
     printf("File size: %d bytes\nStruct size: %d bytes\nCantidad de muestras: %d\n",binary_size,struct_size,cant_muestras);
 
+    struct data_struct *muestras = mmap(NULL,binary_size,PROT_READ,MAP_PRIVATE,raw_fd,0);
+    int promedio = 0;
+    for(int i=0;i<cant_muestras;i++){
+        int muestra = muestras[i].validSamples;
+        printf("valid_samples[%d]: %d\n",i,muestra);
+        promedio += muestra;
+    }
+    promedio /= cant_muestras;
+
+    printf("valid_samples promedio: %d\n",promedio);
+    fclose(raw);
+    munmap(muestras,binary_size);
     exit(EXIT_SUCCESS);
 }
